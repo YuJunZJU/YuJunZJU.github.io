@@ -1,0 +1,337 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Arduino中断 | YuJun</title><meta name="author" content="YuJun"><meta name="copyright" content="YuJun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="有关怎么在Arduino板子上实现中断">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Arduino中断">
+<meta property="og:url" content="http://example.com/2025/10/12/MyStudy/MCU/Arduino/arduino%E4%B8%AD%E6%96%AD/index.html">
+<meta property="og:site_name" content="YuJun">
+<meta property="og:description" content="有关怎么在Arduino板子上实现中断">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/arduino.jpg">
+<meta property="article:published_time" content="2025-10-12T04:00:01.000Z">
+<meta property="article:modified_time" content="2025-10-11T17:52:48.033Z">
+<meta property="article:author" content="YuJun">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/arduino.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Arduino中断",
+  "url": "http://example.com/2025/10/12/MyStudy/MCU/Arduino/arduino%E4%B8%AD%E6%96%AD/",
+  "image": "http://example.com/img/arduino.jpg",
+  "datePublished": "2025-10-12T04:00:01.000Z",
+  "dateModified": "2025-10-11T17:52:48.033Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "YuJun",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/10/12/MyStudy/MCU/Arduino/arduino%E4%B8%AD%E6%96%AD/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Arduino中断',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">17</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-music"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-video"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/arduino.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">YuJun</span></a><a class="nav-page-title" href="/"><span class="site-name">Arduino中断</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-music"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-video"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Arduino中断</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-12T04:00:01.000Z" title="发表于 2025-10-12 12:00:01">2025-10-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-11T17:52:48.033Z" title="更新于 2025-10-12 01:52:48">2025-10-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/MyStudy/">MyStudy</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/MyStudy/Arduino/">Arduino</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="中断类型"><a href="#中断类型" class="headerlink" title="中断类型"></a>中断类型</h2><p>外部中断</p>
+<p>Arduino UNO的外部中断引脚比较少</p>
+<p>核心函数</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">attachInterrupt(digitalPinToInterrupt(pin), ISR, mode);</span><br></pre></td></tr></table></figure>
+<p><strong><code>digitalPinToInterrupt(pin)</code>:</strong></p>
+<ul>
+<li><strong>作用：</strong> 这是一个辅助函数，用于将Arduino的引脚号（如 2 或 3）转换为微控制器内部对应的中断号（如 0 或 1）。</li>
+<li><strong>为什么不直接用<code>0</code>或<code>1</code>？</strong> 为了代码的可移植性。在不同的Arduino板子上，中断号和引脚号的对应关系可能不同。使用这个函数可以确保你的代码在UNO、Mega等板子上都能正常工作。</li>
+<li><strong>示例：</strong> 在UNO上，<code>digitalPinToInterrupt(2)</code> 返回 <code>0</code>，<code>digitalPinToInterrupt(3)</code> 返回 <code>1</code>。</li>
+</ul>
+<p><strong><code>ISR</code> :</strong></p>
+<ul>
+<li><strong>作用：</strong> 这是一个<strong>函数名</strong>。这个函数就是当中断被触发时，你需要执行的代码块。你必须自己定义这个函数。</li>
+<li>注意点：<ul>
+<li>ISR应该尽可能快地执行完毕</li>
+<li>禁止使用delay()，因为delay()依赖于定时器，而中断会影响定时器的正常工作</li>
+<li>谨慎使用串口，因为串口通信本身也依赖于中断</li>
+<li><strong>共享变量必须声明为 <code>volatile</code>:</strong> 如果一个变量在ISR中被修改，并且在<code>loop()</code>或其他函数中也会被使用，那么在定义它时必须加上<code>volatile</code>关键字。</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>mode</code> (触发模式):</strong></p>
+<ul>
+<li><strong>作用：</strong> 定义了什么样的电平变化会触发中断。有四种模式可选：<ul>
+<li><code>LOW</code>: 当引脚为低电平时，持续触发中断。<strong>（慎用，容易导致程序卡在中断里）</strong></li>
+<li><code>CHANGE</code>: 当引脚电平发生任何改变时（从高到低 或 从低到高）触发。</li>
+<li><code>RISING</code>: 当引脚电平从低电平变为高电平时（上升沿）触发。</li>
+<li><code>FALLING</code>: 当引脚电平从高电平变为低电平时（下降沿）触发。对于按钮按下（使用上拉电阻）的场景，<code>FALLING</code> 是最常用的模式。</li>
+</ul>
+</li>
+</ul>
+<p>案例：用中断切换LED状态</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> interruptPin = <span class="number">2</span>;  <span class="comment">// 按钮连接到中断引脚2</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> ledPin = <span class="number">13</span>;       <span class="comment">// 用于中断切换的LED</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> pwmPin = <span class="number">9</span>;        <span class="comment">// 用于呼吸效果的LED</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> fadeAmount = <span class="number">5</span>;  <span class="comment">//用于实现呼吸灯</span></span><br><span class="line"><span class="keyword">volatile</span> ledState = LOW;  </span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">setup</span><span class="params">()</span>&#123;</span><br><span class="line">	pinMode(ledPin,OUTPUT);</span><br><span class="line">	pinMode(pwmPin,OUTPUT);</span><br><span class="line">	pinMode(interrupt,INPUT_PULLUP);  <span class="comment">//设置上拉电阻，这样按下按键之后就会出现下降沿</span></span><br><span class="line">	</span><br><span class="line">	attachInterrupt(digitalPinToInterrupt(interruptPin),blinkLED,FALLING);</span><br><span class="line">&#125; <span class="comment">//中断</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">loop</span><span class="params">()</span>&#123;</span><br><span class="line">	brightness += fadeAmount;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>(brightness&lt;=<span class="number">0</span> || brightness&gt;=<span class="number">255</span>)&#123;</span><br><span class="line">		fadeAmount = -fadeAmount;</span><br><span class="line">&#125; <span class="comment">//当溢出时翻转呼吸状态</span></span><br><span class="line">	analogWrite(pwmPin,brightness);</span><br><span class="line">	</span><br><span class="line">	delay(<span class="number">30</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">blinkLED</span><span class="params">()</span>&#123;</span><br><span class="line">	ledState = -ledState;</span><br><span class="line">	digitalWrite(ledPin,ledState);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注：</p>
+<p>volatile的作用</p>
+<p>现代的编译器非常智能，为了让你的程序运行得更快、占用内存更少，它会进行大量的优化。</p>
+<p>其中一种常见的优化是：如果编译器发现在一段代码里，一个变量被读取了多次，但期间没有代码去修改它，编译器就会觉得“何必每次都去内存里读呢？我把它读一次，存到CPU的一个临时仓库（<strong>寄存器, Register</strong>）里，后面直接从这个飞快的寄存器里取值就行了。”</p>
+<p>我们来设想一下如果上面的代码中没有volatile会发生什么（假设loop中有if (ledState == true)：</p>
+<ol>
+<li><p>编译器开始分析 <code>loop()</code> 函数。</p>
+</li>
+<li><p>它看到了第一次 <code>if (ledState == true)</code>。它从主内存（RAM）中读取 <code>ledState</code> 的值（初始为 <code>LOW</code>/<code>false</code>），并可能把它缓存到一个CPU寄存器里。</p>
+</li>
+<li><p>它继续往下分析 <code>loop()</code> 里的其他代码。在它看来，<strong><code>loop()</code> 函数内部没有任何代码会去修改 <code>ledState</code> 的值</strong>。</p>
+</li>
+<li><p>当它看到第二次 <code>if (ledState == true)</code> 时，它会想：“我刚刚已经读过 <code>ledState</code> 了，而且中间没有任何代码修改它，我没必要再去内存里慢悠悠地读一次了。直接用我缓存 G 在寄存器里的旧值（<code>false</code>）就行！”</p>
+</li>
+<li><p>编译器完全不知道 <code>myISR()</code> 函数的存在，也不知道它会在任何时刻突然闯进来，修改了内存里 <code>ledState</code> 的真实值。</p>
+</li>
+</ol>
+<p><strong><code>volatile</code> 的本质：</strong> 告诉编译器不要对该变量的访问进行优化</p>
+<p>引脚变化中断</p>
+<p>支持的引脚比较多， (UNO上几乎所有数字和模拟引脚都支持)</p>
+<h3 id="PCINT-引脚变化中断功能"><a href="#PCINT-引脚变化中断功能" class="headerlink" title="PCINT(引脚变化中断功能)"></a>PCINT(引脚变化中断功能)</h3><p>在ATmega328P芯片（Arduino UNO的核心）上，支持PCINT的引脚被分成了<strong>三个组</strong>：</p>
+<ul>
+<li><strong>PCINT0 (组0):</strong> 对应Arduino引脚 <strong>D8, D9, D10, D11, D12, D13</strong></li>
+<li><strong>PCINT1 (组1):</strong> 对应Arduino引脚 <strong>A0, A1, A2, A3, A4, A5</strong></li>
+<li><strong>PCINT2 (组2):</strong> 对应Arduino引脚 <strong>D0, D1, D2, D3, D4, D5, D6, D7</strong></li>
+</ul>
+<p>上述不一定对（是AI说的，具体应该要查手册）</p>
+<p><strong>关键点：</strong></p>
+<ul>
+<li>每个组共享<strong>一个</strong>中断。</li>
+<li>只要组内<strong>任何一个</strong>被启用的引脚电平发生变化，就会触发该组的中断。</li>
+<li>你需要为每个启用的组编写一个对应的中断服务程序（ISR）。</li>
+</ul>
+<h3 id="3-如何设置PCINT？——-操作寄存器"><a href="#3-如何设置PCINT？——-操作寄存器" class="headerlink" title="3. 如何设置PCINT？—— 操作寄存器"></a>3. 如何设置PCINT？—— 操作寄存器</h3><p>设置PCINT不像<code>attachInterrupt</code>那样只有一个函数，你需要手动配置三个关键的寄存器。</p>
+<ol>
+<li><strong><code>PCICR</code> - 引脚变化中断控制寄存器</strong><ul>
+<li>这个寄存器用来开启或关闭<strong>整个组</strong>的中断功能。</li>
+<li>它有三个关键位：<code>PCIE0</code>, <code>PCIE1</code>, <code>PCIE2</code>。</li>
+<li>要启用组0的中断，你就需要把<code>PCIE0</code>位设为1。</li>
+<li><strong>代码示例 (启用组0):</strong> <code>PCICR |= bit(PCIE0);</code>  (或者 <code>PCICR |= B00000001;</code>)</li>
+</ul>
+</li>
+<li><strong><code>PCMSKx</code> - 引脚变化屏蔽寄存器 </strong><ul>
+<li><code>PCICR</code>打开了组的大门后，<code>PCMSKx</code>（<code>PCMSK0</code>, <code>PCMSK1</code>, <code>PCMSK2</code>）用来选择你关心组内的<strong>哪几个具体引脚</strong>。</li>
+<li><code>PCMSK0</code> 对应组0，<code>PCMSK1</code> 对应组1，以此类推。</li>
+<li>每个寄存器有8个位，每一位对应组内的一个引脚。将某位设为1，就表示启用该引脚的中断。</li>
+<li><strong>代码示例 (在组0中，启用D10引脚的中断):</strong><ul>
+<li>查表可知，D10对应的是<code>PCINT2</code>。</li>
+<li><code>PCMSK0 |= bit(PCINT2);</code> (或者 <code>PCMSK0 |= B00000100;</code>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>ISR(PCINTx_vect)</code> - 中断服务程序 (The Handler)</strong><ul>
+<li>这是中断触发后实际执行的函数。</li>
+<li>组0的中断向量是 <code>PCINT0_vect</code>，组1是 <code>PCINT1_vect</code>，组2是 <code>PCINT2_vect</code>。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;avr/io.h&gt;</span><br><span class="line">#include &lt;avr/interrupt.h&gt;</span><br><span class="line"></span><br><span class="line">// 定义引脚</span><br><span class="line">const int buttonPin1 = 10; // 属于PCINT0组, 对应PCINT2</span><br><span class="line">const int buttonPin2 = 11; // 属于PCINT0组, 对应PCINT3</span><br><span class="line">const int ledPin1 = 5;</span><br><span class="line">const int ledPin2 = 6;</span><br><span class="line"></span><br><span class="line">// volatile变量，用于在ISR和loop之间安全地共享状态</span><br><span class="line">volatile bool led1_state = LOW;</span><br><span class="line">volatile bool led2_state = LOW;</span><br><span class="line"></span><br><span class="line">// 用于在ISR中判断哪个引脚发生了变化</span><br><span class="line">volatile byte last_portb_state;</span><br><span class="line"></span><br><span class="line">void setup() &#123;</span><br><span class="line">  // 1. 设置引脚模式</span><br><span class="line">  pinMode(ledPin1, OUTPUT);</span><br><span class="line">  pinMode(ledPin2, OUTPUT);</span><br><span class="line">  </span><br><span class="line">  // 将按钮引脚设置为输入，并启用内部上拉电阻</span><br><span class="line">  pinMode(buttonPin1, INPUT_PULLUP);</span><br><span class="line">  pinMode(buttonPin2, INPUT_PULLUP);</span><br><span class="line"></span><br><span class="line">  // 2. 配置PCINT</span><br><span class="line">  // D10和D11都属于组0 (PCINT0)</span><br><span class="line">  </span><br><span class="line">  // 步骤A: 启用组0 (PCINT0) 的中断</span><br><span class="line">  PCICR |= bit(PCIE0); // 或者 PCICR |= (1 &lt;&lt; PCIE0);</span><br><span class="line"></span><br><span class="line">  // 步骤B: 启用组0中我们关心的具体引脚</span><br><span class="line">  // D10是PB2，对应PCINT2</span><br><span class="line">  // D11是PB3，对应PCINT3</span><br><span class="line">  PCMSK0 |= bit(PCINT2) | bit(PCINT3); // 启用PCINT2和PCINT3</span><br><span class="line"></span><br><span class="line">  // 3. 全局中断使能 (通常Arduino的setup()会自动做，但写出来更清晰)</span><br><span class="line">  sei(); </span><br><span class="line"></span><br><span class="line">  // 初始化last_portb_state，只关心我们监控的位</span><br><span class="line">  last_portb_state = PINB &amp; (bit(PORTB2) | bit(PORTB3));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 中断服务程序 for PCINT Group 0</span><br><span class="line">ISR(PCINT0_vect) &#123;</span><br><span class="line">  // 读取PORTB寄存器中我们关心的引脚的当前状态</span><br><span class="line">  byte current_portb_state = PINB &amp; (bit(PORTB2) | bit(PORTB3));</span><br><span class="line"></span><br><span class="line">  // 检查D10 (PCINT2) 是否发生变化</span><br><span class="line">  if ((current_portb_state &amp; bit(PORTB2)) != (last_portb_state &amp; bit(PORTB2))) &#123;</span><br><span class="line">    // D10电平改变了。因为是INPUT_PULLUP，按下时变为LOW</span><br><span class="line">    if (!(current_portb_state &amp; bit(PORTB2))) &#123; // 检查是否是下降沿 (变为LOW)</span><br><span class="line">      led1_state = !led1_state; // 翻转LED1状态</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // 检查D11 (PCINT3) 是否发生变化</span><br><span class="line">  if ((current_portb_state &amp; bit(PORTB3)) != (last_portb_state &amp; bit(PORTB3))) &#123;</span><br><span class="line">    // D11电平改变了</span><br><span class="line">    if (!(current_portb_state &amp; bit(PORTB3))) &#123; // 检查是否是下降沿</span><br><span class="line">      led2_state = !led2_state; // 翻转LED2状态</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // 更新最后的状态，为下一次中断做准备</span><br><span class="line">  last_portb_state = current_portb_state;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void loop() &#123;</span><br><span class="line">  // 主循环的任务就是根据ISR中改变的状态变量，来更新LED</span><br><span class="line">  // 这样将耗时操作（即使digitalWrite很快）移出ISR，是很好的编程习惯</span><br><span class="line">  digitalWrite(ledPin1, led1_state);</span><br><span class="line">  digitalWrite(ledPin2, led2_state);</span><br><span class="line"></span><br><span class="line">  // 主循环可以做其他任何事情，不会错过按钮的按动</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>总结一下，如果你想开启某个引脚的引脚变化中断的话，流程是</p>
+<ol>
+<li>打开整组的开关</li>
+<li>打开相应引脚的开关</li>
+<li>编写中断函数逻辑（其中要自己判断是上升沿还是下降沿）</li>
+</ol>
+<p>定时器中断</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">YuJun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/10/12/MyStudy/MCU/Arduino/arduino%E4%B8%AD%E6%96%AD/">http://example.com/2025/10/12/MyStudy/MCU/Arduino/arduino%E4%B8%AD%E6%96%AD/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">YuJun</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/arduino.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/10/13/MyStudy/MCU/other/serial/" title="串口"><img class="cover" src="/img/arduino.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">串口</div></div><div class="info-2"><div class="info-item-1">串口相关知识</div></div></div></a><a class="pagination-related" href="/2025/10/12/MyStudy/MCU/esp32/esp32/" title="esp32"><img class="cover" src="/img/arduino.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">esp32</div></div><div class="info-2"><div class="info-item-1">esp32相关</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">YuJun</div><div class="author-info-description">每天...都要...吃早饭...</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">17</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/YuJunZJU" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:winqin0725@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">博客施工中...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E7%B1%BB%E5%9E%8B"><span class="toc-text">中断类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PCINT-%E5%BC%95%E8%84%9A%E5%8F%98%E5%8C%96%E4%B8%AD%E6%96%AD%E5%8A%9F%E8%83%BD"><span class="toc-text">PCINT(引脚变化中断功能)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AEPCINT%EF%BC%9F%E2%80%94%E2%80%94-%E6%93%8D%E4%BD%9C%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">3. 如何设置PCINT？—— 操作寄存器</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/MyTarget/%E5%A4%A7%E4%BA%8C%E7%A7%8B%E5%86%AC/" title="大二秋冬目标"><img src="/img/target.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="大二秋冬目标"/></a><div class="content"><a class="title" href="/2025/10/17/MyTarget/%E5%A4%A7%E4%BA%8C%E7%A7%8B%E5%86%AC/" title="大二秋冬目标">大二秋冬目标</a><time datetime="2025-10-17T04:00:00.000Z" title="发表于 2025-10-17 12:00:00">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/MyTarget/MyTarget/" title="MyTarget"><img src="/img/target.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MyTarget"/></a><div class="content"><a class="title" href="/2025/10/17/MyTarget/MyTarget/" title="MyTarget">MyTarget</a><time datetime="2025-10-17T04:00:00.000Z" title="发表于 2025-10-17 12:00:00">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/MyThought/%E5%AE%9E%E5%8A%9B%E8%AF%B4%E8%AF%9D/" title="实力真的很重要"><img src="/img/mythought.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="实力真的很重要"/></a><div class="content"><a class="title" href="/2025/10/17/MyThought/%E5%AE%9E%E5%8A%9B%E8%AF%B4%E8%AF%9D/" title="实力真的很重要">实力真的很重要</a><time datetime="2025-10-17T04:00:00.000Z" title="发表于 2025-10-17 12:00:00">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/16/MyCompetition/%E5%B7%A5%E5%88%9B%E8%B5%9B/%E8%A7%86%E8%A7%89%E9%81%BF%E9%9A%9C/" title="视觉避障方案"><img src="/img/robot.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="视觉避障方案"/></a><div class="content"><a class="title" href="/2025/10/16/MyCompetition/%E5%B7%A5%E5%88%9B%E8%B5%9B/%E8%A7%86%E8%A7%89%E9%81%BF%E9%9A%9C/" title="视觉避障方案">视觉避障方案</a><time datetime="2025-10-16T04:00:00.000Z" title="发表于 2025-10-16 12:00:00">2025-10-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/13/MyStudy/MCU/other/serial/" title="串口"><img src="/img/arduino.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="串口"/></a><div class="content"><a class="title" href="/2025/10/13/MyStudy/MCU/other/serial/" title="串口">串口</a><time datetime="2025-10-13T04:00:01.000Z" title="发表于 2025-10-13 12:00:01">2025-10-13</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By YuJun</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.0.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.1</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.1"></script><script src="/js/main.js?v=5.5.1"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
